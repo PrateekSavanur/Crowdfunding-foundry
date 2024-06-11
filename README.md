@@ -1,66 +1,79 @@
-## Foundry
+# Crowdfunding Smart Contract
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## Overview
 
-Foundry consists of:
+This repository contains a set of Solidity smart contracts for a decentralized crowdfunding platform. The platform allows project creators to raise funds for their projects and distribute ERC20 tokens to contributors. The contracts included are:
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+1. **Crowdfunding**: Manages the creation, funding, and token distribution of crowdfunding projects.
+2. **RewardToken**: ERC20 token that is used as a reward for project contributors.
+3. **TokenFactory**: Factory contract to create new instances of `RewardToken`.
 
-## Documentation
+## Contracts
 
-https://book.getfoundry.sh/
+### Crowdfunding
+
+The `Crowdfunding` contract is the main contract for managing projects, contributions, and token distribution.
+
+#### Features
+
+- **Create Project**: Project owners can create a new crowdfunding project with a funding goal, duration, and reward token details.
+- **Contribute Funds**: Users can contribute ETH to projects they support.
+- **Close Project**: Automatically closes a project when its deadline is reached or the funding goal is met.
+- **Withdraw Funds**: Project owners can withdraw the funds raised once the project is closed.
+- **Start ICO**: Initiates the token distribution process for a project.
+- **Distribute Tokens**: Distributes reward tokens to contributors based on their contributions.
+- **Withdraw Leftover Tokens**: Allows project owners to withdraw any leftover tokens after the ICO is completed.
+
+### RewardToken
+
+The `RewardToken` contract is an ERC20 token used to reward contributors of a crowdfunding project.
+
+#### Constructor Parameters
+
+- `_name`: The name of the token.
+- `_symbol`: The symbol of the token.
+- `_initialAmount`: The initial supply of tokens.
+- `_owner`: The address that will own the initial supply.
+
+### TokenFactory
+
+The `TokenFactory` contract is used to create new instances of `RewardToken`.
+
+#### Features
+
+- **Create Token**: Creates a new `RewardToken` and assigns the initial supply to the specified owner.
+
+#### Events
+
+- `TokenCreated(address indexed projectOwner, address indexed tokenContract)`: Emitted when a new token is created.
+
+## Deployment
+
+1. Deploy the `TokenFactory` contract.
+2. Deploy the `Crowdfunding` contract with the address of the deployed `TokenFactory` contract.
 
 ## Usage
 
-### Build
+### Creating a Project
 
-```shell
-$ forge build
-```
+Call the `createProject` function with the following parameters:
 
-### Test
+- `_owner`: The address of the project owner.
+- `_goalAmount`: The funding goal in wei.
+- `_durationDays`: The duration of the crowdfunding campaign in days.
+- `_tokenName`: The name of the reward token.
+- `_tokenTicker`: The symbol of the reward token.
+- `_tokenPerEth`: The amount of tokens per ETH contributed.
 
-```shell
-$ forge test
-```
+### Contributing to a Project
 
-### Format
+Send ETH to the `contributeFunds` function with the `_projectId` of the project you wish to support.
 
-```shell
-$ forge fmt
-```
+### Withdrawing Funds
 
-### Gas Snapshots
+Once a project is closed, the project owner can call the `withdrawFunds` function with the `_projectId` to withdraw the funds raised.
 
-```shell
-$ forge snapshot
-```
+### Starting and Completing ICO
 
-### Anvil
+The project owner can call `startICO` to initiate the token distribution process. Once the ICO is started, the `distributeTokens` function can be called to distribute tokens to all contributors.
 
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
