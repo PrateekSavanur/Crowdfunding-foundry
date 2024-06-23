@@ -6,6 +6,10 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Crowdfunding {
     struct Project {
+        string companyName;
+        string description;
+        string tokenName;
+        string tokenTicker;
         address tokenContractAddress;
         uint256 funded;
         uint256 fundingGoal;
@@ -43,6 +47,8 @@ contract Crowdfunding {
     }
 
     function createProject(
+        string memory _companyName,
+        string memory _description,
         address _owner,
         uint256 _goalAmount,
         uint256 _durationDays,
@@ -58,11 +64,15 @@ contract Crowdfunding {
         address newTokenAddress = tokenFactory.createToken(_tokenName, _tokenTicker, tokensToMint, address(this));
 
         Project storage project = projects[projectIdCounter];
+        project.companyName = _companyName;
+        project.description = _description;
         project.tokenContractAddress = newTokenAddress;
         project.fundingGoal = _goalAmount;
         project.deadline = block.timestamp + (_durationDays * 1 days);
         project.owner = _owner;
         project.tokensPerEth = _tokenPerEth;
+        project.tokenName = _tokenName;
+        project.tokenTicker = _tokenTicker;
 
         emit ProjectCreated(projectIdCounter, _owner, _goalAmount, project.deadline);
 
@@ -159,6 +169,10 @@ contract Crowdfunding {
         external
         view
         returns (
+            string memory companyName,
+            string memory description,
+            string memory tokenName,
+            string memory tokenTicker,
             address tokenContractAddress,
             uint256 funded,
             uint256 fundingGoal,
@@ -171,6 +185,10 @@ contract Crowdfunding {
     {
         Project memory project = projects[_projectId];
         return (
+            project.companyName,
+            project.description,
+            project.tokenName,
+            project.tokenTicker,
             project.tokenContractAddress,
             project.funded,
             project.fundingGoal,

@@ -23,6 +23,8 @@ contract CrowdfundingTest is Test {
     }
 
     function testCreateProject() public {
+        string memory companyName = "Test Token";
+        string memory description = "TT";
         string memory tokenName = "Test Token";
         string memory tokenTicker = "TT";
         uint256 goalAmount = 10 ether;
@@ -30,9 +32,15 @@ contract CrowdfundingTest is Test {
         uint256 tokenPerEth = 1000;
 
         vm.prank(owner);
-        crowdfunding.createProject(owner, goalAmount, durationDays, tokenName, tokenTicker, tokenPerEth);
+        crowdfunding.createProject(
+            companyName, description, owner, goalAmount, durationDays, tokenName, tokenTicker, tokenPerEth
+        );
 
         (
+            ,
+            ,
+            ,
+            ,
             ,
             ,
             uint256 fundingGoal,
@@ -60,7 +68,7 @@ contract CrowdfundingTest is Test {
         vm.prank(contributor);
         crowdfunding.contributeFunds{value: contributionAmount}(projectId);
 
-        (, uint256 funded,,,,,,) = crowdfunding.getProjectDetails(projectId);
+        (,,,,, uint256 funded,,,,,,) = crowdfunding.getProjectDetails(projectId);
 
         assertEq(funded, contributionAmount);
         assertEq(crowdfunding.contributions(projectId, contributor), contributionAmount);
@@ -94,12 +102,14 @@ contract CrowdfundingTest is Test {
 
         assertEq(token.balanceOf(contributor), expectedTokens);
         assertTrue(crowdfunding.participatedInICO(projectId, contributor));
-        (,,,,,,, bool icoCompleted) = crowdfunding.getProjectDetails(projectId);
+        (,,,,,,,,,,, bool icoCompleted) = crowdfunding.getProjectDetails(projectId);
         assertTrue(icoCompleted);
     }
 
     // Helper Functions
     function setUpProject() internal {
+        string memory comapnyName = "Test Token";
+        string memory description = "TT";
         string memory tokenName = "Test Token";
         string memory tokenTicker = "TT";
         uint256 goalAmount = 10 ether;
@@ -107,7 +117,9 @@ contract CrowdfundingTest is Test {
         uint256 tokenPerEth = 1000;
 
         vm.prank(owner);
-        crowdfunding.createProject(owner, goalAmount, durationDays, tokenName, tokenTicker, tokenPerEth);
+        crowdfunding.createProject(
+            comapnyName, description, owner, goalAmount, durationDays, tokenName, tokenTicker, tokenPerEth
+        );
     }
 
     function contributeToProject() internal {
